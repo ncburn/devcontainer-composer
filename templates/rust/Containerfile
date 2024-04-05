@@ -1,0 +1,31 @@
+FROM rust:slim-bookworm
+
+ARG USERNAME
+ARG USER_ID
+ARG USER_GROUP_ID
+
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt update && \
+    apt upgrade && \
+    apt install -y  \
+        ca-certificates \
+        xz-utils \
+        openssh-client \
+        openssl \
+        curl \
+        zip \
+        unzip \
+        sudo \
+        git \
+        zsh
+
+COPY ./scripts/container/user.sh ./scripts/container/config-environment.sh /tmp/
+RUN chmod +x /tmp/*.sh && \
+    /tmp/config-environment.sh ${USERNAME} ${USER_ID} ${USER_GROUP_ID} && \
+    rm /tmp/* && \
+    curl -s https://ohmyposh.dev/install.sh | bash -s
+
+ENV TERM=xterm-256color
+
+WORKDIR /home/${USERNAME}
+USER ${USERNAME}

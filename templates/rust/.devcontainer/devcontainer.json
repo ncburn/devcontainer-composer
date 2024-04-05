@@ -1,0 +1,32 @@
+{
+	"name": "rust-project-example",
+	"image": "rust-devcontainer",
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	"mounts": [
+		{
+			"source": "rust-devcontainer_home",
+			"target": "/home/developer",
+			"type": "volume"
+		}
+	],
+	"workspaceMount": "source=${localWorkspaceFolder},target=/home/developer/workspace,type=bind,consistency=cached",
+	"workspaceFolder": "/home/developer/workspace",
+	"remoteUser": "developer",
+	"containerUser": "developer",
+	
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"rust-lang.rust-analyzer",
+				"vadimcn.vscode-lldb"
+			]
+		}
+	},
+	"runArgs": [
+		"--name=rust-project-example"
+	]
+}
