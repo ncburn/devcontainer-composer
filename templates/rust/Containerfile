@@ -5,11 +5,10 @@ ARG USER_ID
 ARG USER_GROUP_ID
 
 RUN --mount=type=cache,target=/var/cache/apt \
-    apt update && \
-    apt upgrade && \
-    apt install -y  \
+    apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -q -y --no-install-suggests \
         ca-certificates \
-        xz-utils \
         openssh-client \
         openssl \
         curl \
