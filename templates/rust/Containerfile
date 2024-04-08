@@ -26,5 +26,4 @@ RUN chmod +x /tmp/*.sh && \
 
 ENV TERM=xterm-256color
 
-WORKDIR /home/${USERNAME}
 USER ${USERNAME}
