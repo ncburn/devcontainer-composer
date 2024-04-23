@@ -1,0 +1,33 @@
+{
+	"name": "dotnet-project-name",
+	"image": "localhost/dotnet-devcontainer",
+	"init": false,
+
+	"mounts": [
+		{
+			"source": "dotnet-devcontainer_home",
+			"target": "/home/developer",
+			"type": "volume"
+		}
+	],
+	"workspaceMount": "source=${localWorkspaceFolder},target=/home/developer/workspace,type=bind,consistency=cached",
+	"workspaceFolder": "/home/developer/workspace",
+	
+	"remoteUser": "developer",
+	"containerUser": "developer",
+	
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-dotnettools.csharp",
+				"Ionide.Ionide-fsharp"
+			]
+		}
+	},
+	
+	"runArgs": [
+		"--name=dotnet-project-name",
+		"--cap-add=SYS_PTRACE",
+		"--security-opt", "seccomp=unconfined"
+	]
+}
