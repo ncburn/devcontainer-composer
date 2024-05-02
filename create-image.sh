@@ -1,4 +1,6 @@
 #! /bin/bash
+set -e
+
 print_usage() {
     echo -e "\nUsage: -d path/to/devcontainer/files -n name_of_image"
 }
@@ -40,8 +42,7 @@ if [ ! -e "${containerfile_path}" ]; then
     exit 1
 fi
 
-container_app_name=$(get_container_app_name)
-if [ -z "${container_app_name}" ]; then
+if [ -z "${CONTAINER_COMMAND}" ]; then
     echo "podman and/or docker were not found and are required."
 
     exit 1
@@ -52,14 +53,24 @@ username=developer
 user_id=$(id -u)
 user_group_id=$(id -g)
 
-home_volume_name="${image_name}_home"
-create_volume "${home_volume_name}"
+create_devcontainer_image \
+    $containerfile_path \
+    $image_name \
+    $context_path \
+    $username \
+    $user_id \
+    $user_group_id
 
-${container_app_name} \
-    build \
-    -f ${containerfile_path} \
-    -t ${image_name} \
-    --build-arg USERNAME=$username \
-    --build-arg USER_ID=$user_id \
-    --build-arg USER_GROUP_ID=$user_group_id \
-    ${context_path}
+home_volume_name="${image_name}_home"
+
+if ! check_volume_exists "${home_volume_name}"; then
+    intializer_name=$(create_initializer_image \
+        "templates/home-vol-initializer/Containerfile" \
+        $image_name \
+        $context_path \
+        $username \
+        $username)
+
+    create_volume "${home_volume_name}"
+    run_initializer $intializer_name "${home_volume_name}" "/home/${username}"
+fi

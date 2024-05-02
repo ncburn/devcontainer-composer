@@ -1,0 +1,12 @@
+ARG DEVCONTAINER_IMAGE_NAME
+FROM ${DEVCONTAINER_IMAGE_NAME}
+
+ARG OWNER
+ARG GROUP
+
+# RUN mkdir -p /tmp/home/oh-my-posh/ && \
+#     curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /tmp/home/.local/bin
+COPY --chown=${OWNER}:${GROUP} resources/citrus-simple.omp.json resources/default.zshrc /tmp/home/
+COPY --chown=${OWNER}:${GROUP} --chmod=744 scripts/container/init-home-vol.sh /tmp/home/
+
+ENTRYPOINT [ "/tmp/init-home-vol.sh" ]
