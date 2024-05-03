@@ -82,13 +82,15 @@ create_initializer_image() {
 create_volume() {
     local volume_name=$1
 
-    if check_volume_exists "${volume_name}"; then
-        $CONTAINER_COMMAND volume create "$volume_name"
-
-        return 0
+    if [[ $(check_volume_exists "${volume_name}") -eq $FALSE ]]; then
+        if $CONTAINER_COMMAND volume create "$volume_name" >/dev/null 2>&1; then
+            echo $TRUE
+        else
+            echo $FALSE
+        fi
+    else
+        echo $FALSE
     fi
-
-    return 1
 }
 
 run_initializer() {

@@ -72,8 +72,8 @@ test_get_compose_app_name_returns_expected_app_name() {
     assert_string $result $expected_compose_app_name
 }
 
-test_check_volume_exists_expect_doesnt_exist() {
-    echo -n "test_check_volume_exists_expect_doesnt_exist: "
+test_check_volume_exists_when_vol_not_exist_returns_false() {
+    echo -n "test_check_volume_exists_when_vol_not_exist_returns_false: "
     local expected_value=$FALSE
 
     local result=$(check_volume_exists 'asdf')
@@ -81,13 +81,45 @@ test_check_volume_exists_expect_doesnt_exist() {
     assert_value $result $expected_value 
 }
 
-test_check_volume_exists_expect_exists() {
+test_check_volume_exists_when_vol_exists_returns_true() {
+    echo -n "test_check_volume_exists_when_vol_exists_returns_true: "
+
     local volume_name="test_check_volume_exists_expect_exists_vol"
     local expected_value=$TRUE
     $expected_container_app_name volume rm $volume_name >/dev/null 2>&1
-    $expected_container_app_name volume create $volume_name
+    $expected_container_app_name volume create $volume_name >/dev/null 2>&1
 
     local result=$(check_volume_exists $volume_name)
+
+    assert_value $result $expected_value
+
+    #Cleanup
+    $expected_container_app_name volume rm $volume_name >/dev/null 2>&1
+}
+
+test_create_volume_expect_volume_created() {
+    echo -n "test_create_volume_expect_volume_created: "
+
+    local volume_name="test_create_volume_expect_volume_created_vol"
+    local expected_value=$TRUE
+    $expected_container_app_name volume rm $volume_name >/dev/null 2>&1
+    
+    local result=$(create_volume $volume_name)
+
+    assert_value $result $expected_value
+
+    #Cleanup
+    $expected_container_app_name volume rm $volume_name >/dev/null 2>&1
+}
+
+test_create_volume_expect_volume_not_created() {
+    echo -n "test_create_volume_expect_volume_not_created: "
+
+    local volume_name="test_create_volume_expect_volume_not_created_vol"
+    local expected_value=$FALSE
+    $expected_container_app_name volume create $volume_name >/dev/null 2>&1
+
+    local result=$(create_volume $volume_name)
 
     assert_value $result $expected_value
 
@@ -99,5 +131,7 @@ test_check_app_exists_returns_true
 test_check_app_exists_returns_false
 test_get_container_app_name_returns_expected_app_name
 test_get_compose_app_name_returns_expected_app_name
-test_check_volume_exists_expect_doesnt_exist
-test_check_volume_exists_expect_exists
+test_check_volume_exists_when_vol_not_exist_returns_false
+test_check_volume_exists_when_vol_exists_returns_true
+test_create_volume_expect_volume_created
+test_create_volume_expect_volume_not_created
