@@ -135,3 +135,6 @@ test_check_volume_exists_when_vol_not_exist_returns_false
 test_check_volume_exists_when_vol_exists_returns_true
 test_create_volume_expect_volume_created
 test_create_volume_expect_volume_not_created
+
+test2=$(create_initializer_image)
+echo "Init: ${test2}"

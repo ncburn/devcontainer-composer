@@ -61,16 +61,16 @@ create_devcontainer_image \
     $user_id \
     $user_group_id
 
-home_volume_name="${image_name}_home"
+# home_volume_name="${image_name}_home"
 
-if ! check_volume_exists "${home_volume_name}"; then
-    intializer_name=$(create_initializer_image \
-        "templates/home-vol-initializer/Containerfile" \
-        $image_name \
-        $context_path \
-        $username \
-        $username)
+# if ! check_volume_exists "${home_volume_name}"; then
+#     intializer_name=$(create_initializer_image \
+#         "templates/home-vol-initializer/Containerfile" \
+#         $image_name \
+#         $context_path \
+#         $username \
+#         $username)
 
-    create_volume "${home_volume_name}"
-    run_initializer $intializer_name "${home_volume_name}" "/home/${username}"
-fi
+#     create_volume "${home_volume_name}"
+#     run_initializer $intializer_name "${home_volume_name}" "/home/${username}"
+# fi

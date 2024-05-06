@@ -1,3 +1,4 @@
+#!/bin/bash
 readonly TRUE=1
 readonly FALSE=0
 
@@ -48,35 +49,35 @@ create_devcontainer_image() {
     local containerfile_path=$1
     local image_name=$2
     local context_path=$3
-    local owner=$4
-    local group=$5
+    local devcontainer_username=$4
+    local user_id=$5
+    local user_group_id=$6
 
     ${CONTAINER_COMMAND} build \
         -f ${containerfile_path} \
         -t ${image_name} \
-        --build-arg DEVCONTAINER_IMAGE_NAME=$username \
-        --build-arg OWNER=$owner \
-        --build-arg GROUP=$group \
+        --build-arg USERNAME=$devcontainer_username \
+        --build-arg USER_ID=$user_id \
+        --build-arg USER_GROUP_ID=$user_group_id \
         ${context_path}
 }
 
 create_initializer_image() {
     local containerfile_path=$1
-    local devcontainer_image_name=$2
+    local base_image_name=$2
     local context_path=$3
-    local owner=$4
-    local group=$5
-    local intializer_name="${devcontainer_image_name}_initializer"
+    local devcontainer_username=$4
+    local initializer_image_name="${base_image_name}_initializer"
 
     ${CONTAINER_COMMAND} build \
         -f ${containerfile_path} \
-        -t  $intializer_name \
-        --build-arg OWNER=$owner \
-        --build-arg GROUP=$group \
-        --build-arg DEVCONTAINER_IMAGE_NAME=$devcontainer_image_name \
-        ${context_path}
+        -t ${initializer_image_name} \
+        --build-arg IMAGE=${base_image_name} \
+        --build-arg OWNER=$devcontainer_username \
+        --build-arg GROUP=$devcontainer_username \
+        ${context_path} >/dev/null 2>&1
 
-    echo $intializer_name
+    echo "${initializer_image_name}"
 }
 
 create_volume() {
@@ -101,7 +102,7 @@ run_initializer() {
     $CONTAINER_COMMAND run \
         --replace \
         --name $intializer_name \
-        --mount type=volume,source=${home_volume_name},target=$install_dir
+        --mount type=volume,src=${home_volume_name},target=${install_dir} \
         "localhost/${intializer_name}" \
         "${install_dir}"
 }
