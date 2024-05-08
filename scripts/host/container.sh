@@ -65,19 +65,14 @@ create_devcontainer_image() {
 create_initializer_image() {
     local containerfile_path=$1
     local base_image_name=$2
-    local context_path=$3
-    local devcontainer_username=$4
-    local initializer_image_name="${base_image_name}_initializer"
+    local initializer_image_name=$3
+    local context_path=$4
 
     ${CONTAINER_COMMAND} build \
         -f ${containerfile_path} \
-        -t ${initializer_image_name} \
         --build-arg IMAGE=${base_image_name} \
-        --build-arg OWNER=$devcontainer_username \
-        --build-arg GROUP=$devcontainer_username \
-        ${context_path} >/dev/null 2>&1
-
-    echo "${initializer_image_name}"
+        -t ${initializer_image_name} \
+        ${context_path}
 }
 
 create_volume() {
@@ -98,11 +93,15 @@ run_initializer() {
     local intializer_name=$1
     local home_volume_name=$2
     local install_dir=$3
+    local owner_name=$4
+    local group_name=$5
 
     $CONTAINER_COMMAND run \
         --replace \
         --name $intializer_name \
         --mount type=volume,src=${home_volume_name},target=${install_dir} \
         "localhost/${intializer_name}" \
-        "${install_dir}"
+        "${install_dir}" \
+        "${owner_name}" \
+        "${group_name}"
 }

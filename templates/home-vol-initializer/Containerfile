@@ -1,12 +1,9 @@
 ARG IMAGE
 FROM ${IMAGE}
 
-ARG OWNER
-ARG GROUP
+USER root
 
-COPY --chown=${OWNER}:${GROUP} --chmod=744 ./scripts/container/init-home-vol.sh /tmp/
-COPY --chown=${OWNER}:${GROUP} ./resources/citrus-simple.omp.json ./resources/default.zshrc /tmp/home/
-RUN mkdir -p /tmp/home/oh-my-posh/ && \
-    curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /tmp/home/.local/bin 
+COPY --chmod=744 ./scripts/container/init-home-vol.sh /tmp/
+COPY ./resources/home /tmp/home/
 
 ENTRYPOINT [ "/tmp/init-home-vol.sh" ]
