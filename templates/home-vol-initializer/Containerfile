@@ -1,9 +1,0 @@
-ARG IMAGE
-FROM ${IMAGE}
-
-USER root
-
-COPY --chmod=744 ./scripts/container/init-home-vol.sh /tmp/
-COPY ./resources/home /tmp/home/
-
-ENTRYPOINT [ "/tmp/init-home-vol.sh" ]

@@ -1,7 +1,0 @@
-export PATH=$PATH:~/.local/bin
-
-HISTFILE=~/.zsh_history
-HISTSIZE=1000
-SAVEHIST=10000
-
-eval "$(~/.local/bin/oh-my-posh init bash --config ~/.local/share/themes/citrus-simple.omp.json)"

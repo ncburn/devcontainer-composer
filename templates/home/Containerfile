@@ -1,0 +1,13 @@
+ARG IMAGE
+FROM ${IMAGE}
+
+USER root
+
+COPY ./templates/home/files/ /tmp/home/
+
+RUN curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /tmp/home/local/bin -t /tmp/home/local/share/oh-my-posh && \
+    ZSH="/tmp/home/local/share/oh-my-zsh" sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
+
+COPY --chmod=744 ./scripts/container/config-home.sh /tmp/
+
+ENTRYPOINT [ "/tmp/config-home.sh" ]
