@@ -5,28 +5,30 @@ source ./scripts/host/container.sh
 source ./scripts/host/file.sh
 
 context_path="$(get_parent_dir $(readlink -f ${BASH_SOURCE}))"
-devcontainer_image_name=''
-devcontainer_username=''
 containerfile_path="${context_path}/templates/home/Containerfile"
+image_name="home-files"
+volume_name=""
 
 print_usage() {
-    echo "create-image-volume.sh [options]"
-    echo "  -i devcontainer_image_name"
-    echo "  -u devcontainer_username"
-    echo "  -f containerfile_path #Optional"
-    echo "  -h help"
+    echo "Usage:"
+    echo "  create-image-volume.sh [options] -v volume_name"
+    echo "    -i image_name"
+    echo "    -v volume_name"
+    echo "    -f containerfile_path"
+    echo "    -h help"
+    echo ""
 }
 
-while getopts ':i:u:f:h' parameter; do
+while getopts ':i:f:v:h' parameter; do
     case "$parameter" in
     i)
-        devcontainer_image_name="$OPTARG"
-        ;;
-    u)
-        devcontainer_username="$OPTARG"
+        image_name="$OPTARG"
         ;;
     f)
         containerfile_path="$OPTARG"
+        ;;
+    v)
+        volume_name="$OPTARG"
         ;;
     h)
         print_usage
@@ -34,54 +36,39 @@ while getopts ':i:u:f:h' parameter; do
     esac
 done
 
-if [ -z "${devcontainer_image_name}" ]; then
-    "Devcontainer image name is missing"
+if [ -z "${volume_name}" ]; then
+    echo "Volume name is missing"
     print_usage
 
     exit 1
 fi
 
-if [ -z "${devcontainer_username}" ]; then
-    "Devcontainer username is missing"
-    print_usage
-
-    exit 1
-fi
-
-if [ -z "${containerfile_path}" ]; then
-    echo "Containerfile path can not be an empty string"
-
-    exit 1
-fi
-
-home_volume_name="${devcontainer_image_name}_home"
-initializer_image_name="${devcontainer_image_name}_initializer"
-
-echo "Creating initializer image ${initializer_image_name}..."
+echo "Creating initializer image ${image_name}..."
 echo ""
-create_initializer_image \
+create_image \
     $containerfile_path \
-    $devcontainer_image_name \
-    $initializer_image_name \
+    $image_name \
     $context_path
 
-if [ $(check_volume_exists "${home_volume_name}") -eq $FALSE ]; then
-    echo "Creating volume: '${home_volume_name}'"
-    echo ""
-    if [ $(create_volume "${home_volume_name}") -eq $FALSE ]; then
-        echo "Volume '${home_volume_name}' could not created"
+if [ $(check_volume_exists "${volume_name}") -eq $TRUE ]; then
+    echo "Volume '${volume_name}' already exists"
 
-        return 1
-    fi
-else
-    echo "${home_volume_name} already exists. Skipping volume creation"
+    return 1
+fi
+
+echo "Creating volume: '${volume_name}'"
+echo ""
+if [ $(create_volume "${volume_name}") -eq $FALSE ]; then
+    echo "Volume '${volume_name}' could not created"
+
+    return 1
 fi
 
 echo "Running initializer ${initializer_image_name}..."
 echo ""
-run_initializer \
-    "${initializer_image_name}" \
-    "${home_volume_name}" \
-    "/home/${devcontainer_username}" \
-    $devcontainer_username \
-    $devcontainer_username
+run_container \
+    "${image_name}" \
+    "${image_name}_init" \
+    "sh /tmp/init_volume.sh /tmp/vol" \
+    "${volume_name}" \
+    "/tmp/vol"

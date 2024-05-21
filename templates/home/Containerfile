@@ -1,13 +1,17 @@
-ARG IMAGE
-FROM ${IMAGE}
+FROM alpine:latest AS downloader
 
-USER root
+# RUN apk update && apk upgrade & \
+#     apk add zsh curl && \
+#     curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /tmp/home/local/bin -t /tmp/home/local/share/oh-my-posh && \
+#     ZSH="/tmp/home/local/share/oh-my-zsh" sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 
-COPY ./templates/home/files/ /tmp/home/
+RUN mkdir -p /tmp/home && \
+    mkdir -p /tmp/home/local/bin && \
+    mkdir -p /tmp/home/local/share
 
-RUN curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /tmp/home/local/bin -t /tmp/home/local/share/oh-my-posh && \
-    ZSH="/tmp/home/local/share/oh-my-zsh" sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
+COPY ./templates/home/files /tmp/home/
+COPY --chmod=744 ./scripts/container/init-volume.sh /tmp/
 
-COPY --chmod=744 ./scripts/container/config-home.sh /tmp/
+FROM alpine:latest AS main
 
-ENTRYPOINT [ "/tmp/config-home.sh" ]
+COPY --from=downloader /tmp/ /tmp/
