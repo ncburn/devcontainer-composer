@@ -53,7 +53,7 @@ username=developer
 user_id=$(id -u)
 user_group_id=$(id -g)
 
-create_devcontainer_image \
+create_image \
     $containerfile_path \
     $image_name \
     $context_path \
