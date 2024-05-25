@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 apt-get update -y && \
 apt-get upgrade -y && \
 apt-get install -q -y --no-install-suggests \

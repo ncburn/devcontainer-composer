@@ -12,17 +12,19 @@ create_user () {
     local user_id=$2
 
     if ! id $username &> /dev/null; then
-        useradd -d /home/${username} --gid $user_group_id --uid $user_id -s /bin/zsh $username
+        useradd -d /home/${username} --gid $user_group_id --uid $user_id $username
     fi
 }
 
 enable_sudo () {
     local username=$1
     
+    echo "enable_sudo: ${username}"
+
     if [ ! -d "/etc/sudoers.d" ]; then
         mkdir -p /etc/sudoers.d
     fi
 
-    echo "${USERNAME} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
-    chmod 0440 /etc/sudoers.d/$USERNAME
+    echo "${username} ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${username}
+    chmod 440 /etc/sudoers.d/${username}
 }

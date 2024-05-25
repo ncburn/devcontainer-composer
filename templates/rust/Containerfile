@@ -1,16 +1,10 @@
 FROM rust:slim-bookworm
 
-ARG USERNAME
-ARG USER_ID
-ARG USER_GROUP_ID
+ARG INIT_SCRIPT_PATH="./scripts/container/init-debian.sh"
 
-COPY --chmod=755 ./scripts/container/init-debian.sh /tmp/install.sh
-RUN --mount=type=cache,target=/var/cache/apt /tmp/install.sh
-
-COPY --chmod=755 ./scripts/container/user.sh ./scripts/container/config-environment.sh /tmp/
-RUN /tmp/config-environment.sh ${USERNAME} ${USER_ID} ${USER_GROUP_ID} && \
-    rm /tmp/*
+COPY --chmod=744 ${INIT_SCRIPT_PATH} /tmp/initialize.sh
+RUN --mount=type=cache,target=/var/cache/apt /tmp/initialize.sh && \
+    rm /tmp/initialize.sh && \
+    mkdir -p /usr/local/devcontainer
 
 ENV TERM=xterm-256color
-
-USER ${USERNAME}
