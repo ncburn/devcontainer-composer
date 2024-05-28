@@ -1,33 +1,23 @@
 #!/bin/bash
 print_usage() {
     echo "Usage:"
-    echo "  init-volume.sh [options] -d destination_home_dir"
-    echo "    -u username"
-    echo "    -i user_id"
-    echo "    -g group_id"
-    echo "    -d destination_home_dir"
+    echo "  init-volume.sh [options]"
+    echo "    -s source_dir    (Required)"
+    echo "    -t target_dir    (Required)"
     echo "    -h help"
     echo ""
 }
 
-destination_home_dir=""
-username=""
-user_id=""
-group_id=""
+target_dir=""
+source_dir=""
 
-while getopts ':u:i:g:d:h' parameter; do
+while getopts ':s:t:h' parameter; do
     case "$parameter" in
-    u)
-        username="$OPTARG"
+    s)
+        source_dir="$OPTARG"
         ;;
-    i)
-        user_id="$OPTARG"
-        ;;
-    g)
-        group_id="$OPTARG"
-        ;;
-    d)
-        destination_home_dir="$OPTARG"
+    t)
+        target_dir="$OPTARG"
         ;;
     h)
         print_usage
@@ -35,28 +25,21 @@ while getopts ':u:i:g:d:h' parameter; do
     esac
 done
 
-if [ -z "${destination_home_dir}" ]; then
-    echo "Please specify the home directory/path to initialize"
+if [ -z "${source_dir}" ]; then
+    echo "Missing source directory where files will be copied from"
+    print_usage
 
     exit 1
 fi
 
-echo "Copying files from /tmp/home to ${destination_home_dir}"
-cp -R /tmp/home/* $destination_home_dir
-mv "${destination_home_dir}/local" "${destination_home_dir}/.local"
-mv "${destination_home_dir}/zshrc" "${destination_home_dir}/.zshrc"
+if [ -z "${target_dir}" ]; then
+    echo "Missing target directory where files will be copied from"
+    print_usage
 
-if [ -z "${username}" ]; then
-    exit 0
+    exit 1
 fi
 
-if [ -z "${user_id}" ]; then
-    exit 0
-fi
-
-if [ -z "${group_id}" ]; then
-    exit 0
-fi
-
-addgroup -g $user_id $username
-adduser -D -H -u $user_id -G $group_id $username
+echo "Copying files from ${source_dir} to ${target_dir}"
+cp -R ${source_dir}/* ${target_dir}
+mv ${target_dir}/local ${target_dir}/.local
+mv ${target_dir}/bashrc ${target_dir}/.bashrc

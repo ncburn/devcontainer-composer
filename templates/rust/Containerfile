@@ -1,4 +1,4 @@
-FROM rust:slim-bookworm
+FROM rust:slim-bullseye
 
 ARG INIT_SCRIPT_PATH="./scripts/container/init-debian.sh"
 

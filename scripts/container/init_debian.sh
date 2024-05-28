@@ -10,7 +10,6 @@ apt-get install -q -y --no-install-suggests \
     unzip \
     sudo \
     git \
-    zsh \
     llvm-dev \
     libclang-dev \
     clang

@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 set -e
 
 source ./scripts/host/container.sh
@@ -57,6 +57,7 @@ if [ -z "${containerfile_path}" ]; then
     exit 1
 fi
 
+echo "Creating image: ${image_name}"
 create_image \
     $containerfile_path \
     $image_name \
