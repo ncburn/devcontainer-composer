@@ -1,10 +1,12 @@
-FROM rust:slim-bullseye
+FROM rust:slim-bookworm
 
-ARG INIT_SCRIPT_PATH="./scripts/container/init-debian.sh"
+COPY ./scripts/container/init_debian.sh \
+    ./scripts/container/user.sh \
+    ./scripts/container/create-user.sh \
+    /tmp/
 
-COPY --chmod=744 ${INIT_SCRIPT_PATH} /tmp/initialize.sh
-RUN --mount=type=cache,target=/var/cache/apt /tmp/initialize.sh && \
-    rm /tmp/initialize.sh && \
-    mkdir -p /usr/local/devcontainer
+RUN --mount=type=cache,target=/var/cache/apt bash /tmp/init_debian.sh && \
+    bash /tmp/create-user.sh developer 1000 1000 && \
+    rm -r /tmp/*
 
 ENV TERM=xterm-256color

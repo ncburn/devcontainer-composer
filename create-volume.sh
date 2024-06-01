@@ -72,4 +72,6 @@ if [ -n "${image_name}" ] && [ -n "${command}" ] && [ -n "${mount_path}" ]; then
         "${command}" \
         "${volume_name}" \
         "${mount_path}"
+
+    delete_container "${volume_name}_init" >1
 fi

@@ -113,3 +113,9 @@ run_container() {
         ${image_name} \
         ${command}
 }
+
+delete_container() {
+    local container_name=$1
+
+    $CONTAINER_COMMAND container rm $container_name
+}
