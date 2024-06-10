@@ -11,7 +11,7 @@ RUN apk update && apk upgrade && \
     curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /tmp/home/local/bin -t /tmp/home/local/share/oh-my-posh
 
 COPY ./templates/home/files /tmp/home/
-COPY --chmod=744 ./scripts/container/init-volume.sh /tmp/
+COPY --chmod=744 ./scripts/container/init-volume.sh ./scripts/container/user_busybox.sh ./scripts/container/user.sh /tmp/
 
 FROM alpine:latest AS main
 

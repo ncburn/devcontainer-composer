@@ -73,5 +73,5 @@ if [ -n "${image_name}" ] && [ -n "${command}" ] && [ -n "${mount_path}" ]; then
         "${volume_name}" \
         "${mount_path}"
 
-    delete_container "${volume_name}_init" >1
+    delete_container "${volume_name}_init"
 fi
