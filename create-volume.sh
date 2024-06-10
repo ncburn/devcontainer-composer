@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 source ./scripts/host/container.sh
@@ -13,17 +13,17 @@ print_usage() {
     echo "create-volume.sh [options]"
     echo "  -v volume_name   Name of the volume to create (Required)"
     echo "  -i image_name    Name of the image used to mount volume and execute init scripts"
-    echo "  -c command       Command to execute in the started container"
-    echo "  -m mount_path    Path which the volume will be mounted to"
     echo "  -h               Print the script usage"
 }
 
 volume_name=""
 image_name=""
-command=""
-mount_path=""
+mount_path="/tmp/vol"
+username="developer"
+user_id="$(id -u)"
+group_id="$(id -g)"
 
-while getopts ':i:v:c:m:h' parameter; do
+while getopts ':i:v:h' parameter; do
     case "$parameter" in
     i)
         image_name="$OPTARG"
@@ -31,12 +31,6 @@ while getopts ':i:v:c:m:h' parameter; do
     v)
         volume_name="$OPTARG"
         ;;
-    c)
-        command="$OPTARG"
-        ;;
-    m)
-        mount_path="$OPTARG"
-        ;; 
     h)
         print_usage
         ;;
@@ -49,6 +43,8 @@ if [ -z "${volume_name}" ]; then
 
     exit 1
 fi
+
+command_params="-s /tmp/home -t /tmp/vol -u ${username} -i ${user_id} -g ${group_id}"
 
 if [ $(check_volume_exists "${volume_name}") -eq $TRUE ]; then
     echo "Volume '${volume_name}' already exists"
@@ -63,15 +59,12 @@ if [ $(create_volume "${volume_name}") -eq $FALSE ]; then
     exit 1
 fi
 
-if [ -n "${image_name}" ] && [ -n "${command}" ] && [ -n "${mount_path}" ]; then
-    echo "Running: ${command}"
+run_container \
+    "${image_name}" \
+    "${volume_name}_init" \
+    "${command_params}" \
+    "${volume_name}" \
+    "${mount_path}"
 
-    run_container \
-        "${image_name}" \
-        "${volume_name}_init" \
-        "${command}" \
-        "${volume_name}" \
-        "${mount_path}"
-
-    delete_container "${volume_name}_init"
-fi
+echo -n "Deleting: "
+delete_container "${volume_name}_init"

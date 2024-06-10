@@ -16,3 +16,6 @@ COPY --chmod=744 ./scripts/container/init-volume.sh ./scripts/container/user_bus
 FROM alpine:latest AS main
 
 COPY --from=downloader /tmp/ /tmp/
+#sh init-volume.sh -s /tmp/home -t /tmp/vol -u developer -i 1000 -g 1000
+
+ENTRYPOINT [ "sh", "/tmp/init-volume.sh" ]
