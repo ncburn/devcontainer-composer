@@ -1,6 +1,8 @@
 export LS_OPTIONS='--color=auto'
 export PATH=~/.local/bin:$PATH
-eval "$(dircolors)"
+export SHELL=/bin/bash
+
+eval "$(dircolors -b)"
 
 alias ls='ls $LS_OPTIONS'
 alias ll='ls $LS_OPTIONS -l'
@@ -9,5 +11,5 @@ alias rm='rm -i'
 alias cp='cp -i'
 alias mv='mv -i'
 
-eval "$(oh-my-posh init bash --config ~/citrus-simple.omp.json)"
+eval "$(oh-my-posh init bash --config ~/.local/share/oh-my-posh/citrus-simple.omp.json)"
 eval "$(oh-my-posh completion bash)"
