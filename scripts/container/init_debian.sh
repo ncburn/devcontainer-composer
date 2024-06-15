@@ -9,7 +9,4 @@ apt-get install -q -y --no-install-suggests \
     zip \
     unzip \
     sudo \
-    git \
-    llvm-dev \
-    libclang-dev \
-    clang
+    git
