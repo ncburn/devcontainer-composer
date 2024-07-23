@@ -1,0 +1,21 @@
+FROM alpine:latest AS downloader
+
+USER root
+
+RUN mkdir -p /tmp/home && \
+    mkdir -p /tmp/home/local/bin && \
+    mkdir -p /tmp/home/local/share
+
+RUN apk update && apk upgrade && \
+    apk add bash curl && \
+    curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /tmp/home/local/bin -t /tmp/home/local/share/oh-my-posh
+
+COPY ./templates/home/files /tmp/home/
+COPY --chmod=744 ./scripts/container/init-volume.sh ./scripts/container/user_busybox.sh ./scripts/container/user.sh /tmp/
+
+FROM alpine:latest AS main
+
+COPY --from=downloader /tmp/ /tmp/
+#sh init-volume.sh -s /tmp/home -t /tmp/vol -u developer -i 1000 -g 1000
+
+ENTRYPOINT [ "sh", "/tmp/init-volume.sh" ]

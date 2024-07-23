@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 apt-get update -y && \
 apt-get upgrade -y && \
 apt-get install -q -y --no-install-suggests \
@@ -9,5 +9,4 @@ apt-get install -q -y --no-install-suggests \
     zip \
     unzip \
     sudo \
-    git \
-    zsh
+    git

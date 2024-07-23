@@ -1,0 +1,61 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 2,
+  "final_space": true,
+  "console_title_template": "{{ .UserName }}@{{ .HostName }}",
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "alias": "CurrentDirectory",
+          "type": "path",
+          "style": "diamond",
+          "leading_diamond": "",
+          "trailing_diamond": "",
+          "foreground": "p:DarkText",
+          "background": "p:CurrentDirectory",
+          "properties": {
+            "style": "full"
+          },
+          "template": " {{.Path}} "
+        },
+        {
+          "alias": "GitBranchName",
+          "type": "git",
+          "style": "diamond",
+          "foreground": "p:DarkText",
+          "background": "p:Git",
+          "trailing_diamond": "",
+          "template": " {{.HEAD}}"
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "alias": "CurrentTime",
+          "type": "time",
+          "style": "diamond",
+          "trailing_diamond": "",
+          "foreground": "p:DarkText",
+          "background": "p:InputLine",
+          "properties": {
+            "time_format": "15:04:05"
+          }
+        }
+      ]
+    }
+  ],
+  "palette": {
+    "CurrentDirectory": "#ffff05",
+    "DarkText": "#000000",
+    "Git": "#ffb61a",
+    "InputLine": "#bde54b"
+  }
+}

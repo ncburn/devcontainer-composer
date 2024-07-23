@@ -1,29 +1,46 @@
-#! /bin/bash
-print_usage() {
-    echo -e "\nUsage: -d path/to/devcontainer/files -n name_of_image"
-}
+#!/bin/bash
+set -e
 
 source ./scripts/host/container.sh
 source ./scripts/host/file.sh
 
-devcontainer_dir_path=''
-image_name=''
-while getopts ':d:n:' parameter; do
+if [ -z "${CONTAINER_COMMAND}" ]; then
+    echo "podman and docker were not found and are required."
+
+    exit 1
+fi
+
+print_usage() {
+    echo "create-image.sh [options] -i image_name"
+    echo "  -i image_name            Name of the image to create (Required)"
+    echo "  -f containerfile_path    Path to the Containerfile (Required)"
+    echo "  -c context_path          Context path"
+    echo "  -h                       Print the script usage"
+}
+
+context_path=""
+containerfile_path=""
+image_name=""
+
+while getopts ':c:f:i:h' parameter; do
     case "$parameter" in
-    d)
-        devcontainer_dir_path="$OPTARG"
-        ;;
-    n)
+    i)
         image_name="$OPTARG"
+        ;;
+    f)
+        containerfile_path="$OPTARG"
+        ;;
+    c)
+        context_path="$OPTARG"
+        ;;
+    h)
+        print_usage
         ;;
     esac
 done
 
-if [ -z "${devcontainer_dir_path}" ]; then
-    echo "Missing path to directory containing devcontainer Containerfile"
-    print_usage
-
-    exit 1
+if [ -z "${context_path}" ]; then
+    context_path="$(get_parent_dir $(readlink -f ${BASH_SOURCE}))"
 fi
 
 if [ -z "${image_name}" ]; then
@@ -33,33 +50,15 @@ if [ -z "${image_name}" ]; then
     exit 1
 fi
 
-containerfile_path="${devcontainer_dir_path}/Containerfile"
-if [ ! -e "${containerfile_path}" ]; then
-    echo "${devcontainer_dir_path} does not contain a Containerfile"
+if [ -z "${containerfile_path}" ]; then
+    echo "Missing path to the Containerfile/Dockerfile"
+    print_usage
 
     exit 1
 fi
 
-container_app_name=$(get_container_app_name)
-if [ -z "${container_app_name}" ]; then
-    echo "podman and/or docker were not found and are required."
-
-    exit 1
-fi
-
-context_path="$(get_parent_dir $(readlink -f ${BASH_SOURCE}))"
-username=developer
-user_id=$(id -u)
-user_group_id=$(id -g)
-
-home_volume_name="${image_name}_home"
-create_volume "${home_volume_name}"
-
-${container_app_name} \
-    build \
-    -f ${containerfile_path} \
-    -t ${image_name} \
-    --build-arg USERNAME=$username \
-    --build-arg USER_ID=$user_id \
-    --build-arg USER_GROUP_ID=$user_group_id \
-    ${context_path}
+echo "Creating image: ${image_name}"
+create_image \
+    $containerfile_path \
+    $image_name \
+    $context_path \

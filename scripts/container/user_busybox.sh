@@ -1,19 +1,30 @@
+get_group_name() {
+    local group_info=$1
+
+    echo $(getent group $group_info | awk -F : '{print $1}')
+}
+
+get_username() {
+    local user_info=$1
+
+    echo $(getent passwd $user_info | awk -F : '{print $1}')
+}
+
 create_group () {
     local group_name=$1
     local group_id=$2
 
-    if [ -z "$(getent group $group_name)" ]; then
-        groupadd --gid $group_id $group_name
-    fi
+    addgroup -g $group_id $group_name
 }
 
 create_user () {
     local username=$1
     local user_id=$2
+    local group_info=$3
 
-    if ! id $username &> /dev/null; then
-        useradd -d /home/${username} --gid $user_group_id --uid $user_id $username
-    fi
+    group_name=$(get_group_name $group_info)
+
+    adduser -D -H -h /home/${username} -G $group_name -u $user_id $username
 }
 
 enable_sudo () {

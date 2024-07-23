@@ -1,17 +1,12 @@
 FROM rust:slim-bookworm
 
-ARG USERNAME
-ARG USER_ID
-ARG USER_GROUP_ID
+COPY ./scripts/container/init_debian.sh \
+    ./scripts/container/user.sh \
+    ./scripts/container/create-user.sh \
+    /tmp/
 
-COPY --chmod=755 ./scripts/container/install_debian.sh /tmp/install.sh
-RUN --mount=type=cache,target=/var/cache/apt /tmp/install.sh
-
-COPY --chmod=755 ./scripts/container/user.sh ./scripts/container/config-environment.sh /tmp/
-RUN /tmp/config-environment.sh ${USERNAME} ${USER_ID} ${USER_GROUP_ID} && \
-    rm /tmp/* && \
-    curl -s https://ohmyposh.dev/install.sh | bash -s
+RUN --mount=type=cache,target=/var/cache/apt bash /tmp/init_debian.sh && \
+    bash /tmp/create-user.sh developer 1000 1000 && \
+    rm -r /tmp/*
 
 ENV TERM=xterm-256color
-
-USER ${USERNAME}
